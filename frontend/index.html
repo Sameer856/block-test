@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Arduino Block IDE</title>
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <style>
+    body { font-family: sans-serif; margin: 20px; }
+    #blocklyDiv { height: 480px; width: 100%; border: 1px solid #ccc; }
+    button { margin-top: 10px; margin-right: 10px; padding: 8px 16px; }
+
+    #uploadStatus { font-weight: bold; margin-top: 10px; }
+    #uploadProgress {
+      width: 100%; height: 20px; margin-top: 5px;
+      background: #eee; border-radius: 4px; overflow: hidden;
+    }
+    #uploadProgressBar {
+      height: 100%; width: 0%;
+      background: #00bcd4; transition: width 0.3s;
+    }
+    #uploadConsole {
+      background: #111; color: #0f0;
+      padding: 10px; margin-top: 10px;
+      height: 150px; overflow-y: scroll;
+      font-family: monospace; font-size: 13px;
+      border-radius: 4px;
+    }
+    
+    .error { color: #d32f2f; }
+    .success { color: #388e3c; }
+    .warning { color: #f57c00; }
+    
+    #codeOutput {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 4px;
+      border-left: 4px solid #2196f3;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Arduino Block IDE</h2>
+
+  <label for="boardSelect">Select Board:</label>
+  <select id="boardSelect">
+    <option value="arduino:avr:uno">Uno</option>
+    <option value="arduino:avr:mega">Mega</option>
+    <option value="arduino:avr:nano">Nano (Old Bootloader)</option>
+    <option value="esp32:esp32:esp32">ESP32 Dev Module</option>
+  </select>
+
+  <div id="blocklyDiv"></div>
+
+  <xml id="toolbox" style="display: none">
+    <block type="blink_led"></block>
+  </xml>
+
+  <button onclick="generateCode()">Generate Code</button>
+  <button onclick="uploadCode()">Upload to Arduino</button>
+
+  <pre id="codeOutput"></pre>
+
+  <div id="uploadStatus">Status: Ready</div>
+  <div id="uploadProgress"><div id="uploadProgressBar"></div></div>
+  <div id="uploadConsole">[Upload logs will appear here]</div>
+
+  <script>
+    // 🧱 Define Blockly block
+    Blockly.Blocks['blink_led'] = {
+      init: function () {
+        this.appendDummyInput()
+          .appendField("Blink LED on pin")
+          .appendField(new Blockly.FieldDropdown([
+            ["13", "13"], ["2", "2"], ["12", "12"]
+          ]), "PIN")
+          .appendField("every")
+          .appendField(new Blockly.FieldNumber(1000, 100, 10000), "DELAY")
+          .appendField("ms");
+        this.setPreviousStatement(true);
+        this.setNextStatement(true);
+        this.setColour(160);
+      }
+    };
+
+    Blockly.Arduino = Blockly.Arduino || {};
+
+    Blockly.Arduino['blink_led'] = function (block) {
+      const pin = block.getFieldValue("PIN");
+      const delay = block.getFieldValue("DELAY");
+      return `
+void setup() {
+  pinMode(${pin}, OUTPUT);
+}
+
+void loop() {
+  digitalWrite(${pin}, HIGH);
+  delay(${delay});
+  digitalWrite(${pin}, LOW);
+  delay(${delay});
+}
+`;
+    };
+
+    Blockly.Arduino.blockToCode = function (block) {
+      if (!block) return '';
+      const func = this[block.type];
+      if (typeof func !== 'function') {
+        console.warn('Arduino block not implemented:', block.type);
+        return '';
+      }
+      return func.call(this, block);
+    };
+
+    Blockly.Arduino.workspaceToCode = function (workspace) {
+      const blocks = workspace.getTopBlocks(true);
+      let code = '';
+      for (const block of blocks) {
+        const line = Blockly.Arduino.blockToCode(block);
+        if (Array.isArray(line)) {
+          code += line[0];
+        } else {
+          code += line;
+        }
+      }
+      return code;
+    };
+
+    let workspace;
+    window.onload = function () {
+      workspace = Blockly.inject('blocklyDiv', {
+        toolbox: document.getElementById('toolbox')
+      });
+    };
+
+    function generateCode() {
+      const code = Blockly.Arduino.workspaceToCode(workspace);
+      if (!code.trim()) {
+        document.getElementById("codeOutput").textContent = "// No blocks in workspace. Add a block to generate code.";
+        return;
+      }
+      document.getElementById("codeOutput").textContent = code;
+    }
+
+    function uploadCode() {
+      const code = Blockly.Arduino.workspaceToCode(workspace);
+      const boardType = document.getElementById("boardSelect").value;
+      const status = document.getElementById("uploadStatus");
+      const progressBar = document.getElementById("uploadProgressBar");
+      const consoleBox = document.getElementById("uploadConsole");
+
+      if (!code.trim()) {
+        status.textContent = "❌ No code to upload. Add blocks first.";
+        status.className = "error";
+        return;
+      }
+
+      status.textContent = "⏳ Uploading...";
+      status.className = "";
+      progressBar.style.width = "10%";
+      consoleBox.textContent = "[Uploading started...]\n";
+
+      fetch("http://localhost:3000/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, board: boardType })
+      })
+        .then(res => {
+          progressBar.style.width = "60%";
+          if (!res.ok) {
+            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+          }
+          return res.text();
+        })
+        .then(text => {
+          progressBar.style.width = "100%";
+          status.textContent = "✅ Upload Successful!";
+          status.className = "success";
+          consoleBox.textContent += text;
+        })
+        .catch(err => {
+          progressBar.style.width = "0%";
+          status.textContent = "❌ Upload Failed.";
+          status.className = "error";
+          consoleBox.textContent += `Error: ${err.message}\nCheck board & connection.\n`;
+        });
+    }
+  </script>
+</body>
+</html>

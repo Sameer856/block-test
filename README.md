@@ -13,7 +13,6 @@ A visual programming environment for Arduino using Google's Blockly library. Cre
 ## Project Structure
 
 ```
-arduino-block-ide/
 ├── backend/
 │   └── upload.js               # Node.js backend for code upload
 ├── blink/
