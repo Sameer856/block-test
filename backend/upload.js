@@ -8,6 +8,9 @@ app.use(cors());
 app.use(express.json());
 
 app.post('/upload', (req, res) => {
+  console.log("=== DEBUG INFO ===");
+  console.log("Available USB ports:", 
+    fs.readdirSync('/dev').filter(name => name.startsWith('cu.usb')));
   const code = req.body.code;
   let boardType = req.body.board;
 
@@ -40,4 +43,4 @@ app.post('/upload', (req, res) => {
   });
 });
 
-app.listen(3000, () => console.log('✅ IDE backend running at http://localhost:3000'));
+app.listen(3001, () => console.log('✅ IDE backend running at http://localhost:3001'));
