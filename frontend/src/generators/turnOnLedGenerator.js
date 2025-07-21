@@ -1,19 +1,23 @@
-import arduinoGenerator from './arduinoGenerator.js';
+import arduinoGenerator from "./arduinoGenerator.js";
 
-arduinoGenerator.forBlock['turn_on_led'] = function(block) {
-    const pin = block.getFieldValue('PIN');
-    const state = block.getFieldValue('STATE');
-    arduinoGenerator.addSetup(`pinMode_${pin}`, `pinMode(${pin}, OUTPUT);`);
-    
-    // Check if we're in the setup section
-    let code = '';
-    const parent = block.getParent();
-    
-    if (parent && parent.type === 'setup_and_loop' && 
-        block.getSurroundParent() === parent.getInput('SETUP_CODE').connection.targetBlock()) {
-      code += `  pinMode(${pin}, OUTPUT);\n`;
-    }
-    
-    code += `  digitalWrite(${pin}, ${state});\n`;
-    return code;
-  };
+arduinoGenerator.forBlock["turn_on_led"] = function (block) {
+  const pin = block.getFieldValue("PIN");
+  const state = block.getFieldValue("STATE");
+
+  const parent = block.getSurroundParent();
+  const isInSetup = parent && parent.type === "arduino_setup";
+
+  // Always add pinMode in setup
+  arduinoGenerator.addSetup(`pinMode(${pin}, OUTPUT);`);
+
+  if (isInSetup) {
+    // If block is in setup — write digitalWrite once
+    arduinoGenerator.addSetup(
+      `digitalWrite(${pin}, ${state});`
+    );
+    return "";
+  } else {
+    // If block is in loop — just return the code
+    return `digitalWrite(${pin}, ${state});`;
+  }
+};

@@ -45,19 +45,31 @@ export default function initWorkspace(blocklyDiv, toolboxXml, arduinoGenerator, 
   });
 
   // Add real-time code generation
-  if (typeof onCodeChange === "function") {
-    workspace.addChangeListener(() => {
-      if (!workspace.disposed) {
-        try {
-          const code = arduinoGenerator.workspaceToCode(workspace);
-          onCodeChange(code || "// No blocks in workspace.");
-        } catch (error) {
-          console.error("Error generating code:", error);
-          onCodeChange("// Error generating code");
+// Add real-time code generation
+if (typeof onCodeChange === "function") {
+  workspace.addChangeListener(() => {
+    if (!workspace.disposed) {
+      try {
+        // ✅ Clear old includes, declarations, setup lines etc.
+        if (typeof arduinoGenerator.reset === "function") {
+          arduinoGenerator.reset();
         }
+
+        // Generate fresh code
+        const rawCode = arduinoGenerator.workspaceToCode(workspace);
+        const finalCode = arduinoGenerator.finish
+          ? arduinoGenerator.finish(rawCode)
+          : rawCode;
+
+        onCodeChange(finalCode || "// No blocks in workspace.");
+      } catch (error) {
+        console.error("Error generating code:", error);
+        onCodeChange("// Error generating code");
       }
-    });
-  }
+    }
+  });
+}
+
 
   // Adjust size after a brief delay
   setTimeout(() => {

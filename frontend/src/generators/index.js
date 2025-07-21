@@ -10,6 +10,10 @@ import "./speedBlinkLedBlockGenerator.js"
 import "./servo_move_blockGenerator.js"
 import "./servo_write_blockGenerator.js"
 import "./servo_microseconds_blockGenerator.js"
+import "./servo_attach_block.js"
+import "./servo_detach_block.js"
+import "./servo_attached_blockGenerator.js"
+import "./servo_set_blockGenerator.js"
 
 
 import arduinoGenerator from "./arduinoGenerator";

@@ -11,7 +11,6 @@ arduinoGenerator.includes_ = new Set();
 arduinoGenerator.declarations_ = new Set();
 arduinoGenerator.setups_ = new Set();
 
-
 // Helper methods
 arduinoGenerator.addInclude = function (code) {
   this.includes_.add(code);
@@ -21,40 +20,67 @@ arduinoGenerator.addDeclaration = function (code) {
   this.declarations_.add(code);
 };
 
-arduinoGenerator.addSetup = function (code) {
-  this.setups_.add(code);
+arduinoGenerator.addSetup = function (...lines) {
+  lines.forEach((line) => this.setups_.add(line));
+};
+arduinoGenerator.setupsMap_ = new Map(); // pin -> setup lines
+arduinoGenerator.reset = function () {
+  this.includes_.clear();
+  this.declarations_.clear();
+  this.setups_.clear();
+  this.setupsMap_?.clear?.(); // safely clear maps too
+};
+
+arduinoGenerator.getSetupCode = function () {
+  return Array.from(this.setupsMap_.values())
+    .map((line) => `  ${line}`)
+    .join("\n");
+};
+
+arduinoGenerator.forBlock["math_number"] = function (block) {
+  const code = Number(block.getFieldValue("NUM"));
+  return [code, arduinoGenerator.ORDER_ATOMIC];
 };
 
 arduinoGenerator.workspaceToCode = function (workspace) {
-  this.init(workspace);
+  this.includes_.clear();
+  this.declarations_.clear();
+  this.setups_.clear();
+
+  let loopCode = "";
 
   const blocks = workspace.getTopBlocks(true);
-  let setupBody = '';
-  let loopBody = '';
-
   for (const block of blocks) {
-    if (block.type === 'arduino_setup') {
-      setupBody += this.blockToCode(block);
-    } else if (block.type === 'arduino_loop') {
-      loopBody += this.blockToCode(block);
+    if (block.type === "arduino_loop") {
+      const code = this.blockToCode(block);
+      loopCode += code + "\n";
+    }
+    if (block.type === "arduino_setup") {
+      const setupCode = this.blockToCode(block); // This gives indented lines
+      setupCode.split("\n").forEach((line) => {
+        const clean = line.trim();
+        if (clean) this.setups_.add(clean);
+      });
+    } else {
+      // For blocks like setup_and_loop if used
+      const code = this.blockToCode(block);
+      loopCode += code + "\n";
     }
   }
 
-  const includes = Object.values(this.includes_).join('\n');
-  const declarations = Object.values(this.definitions_).join('\n');
-  const setups = Object.values(this.setups_).map(line => `  ${line}`).join('\n');
+  return `
+${Array.from(this.includes_).join("\n")}
 
-  return `${includes}
-${declarations}
+${Array.from(this.declarations_).join("\n")}
 
 void setup() {
-${setups}${setupBody}
+${Array.from(this.setups_)
+  .map((line) => `  ${line}`)
+  .join("\n")}
 }
 
 void loop() {
-${loopBody}
-}`;
+${loopCode}}`;
 };
-
 
 export default arduinoGenerator;

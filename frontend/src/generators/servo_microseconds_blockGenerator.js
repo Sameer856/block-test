@@ -1,18 +1,34 @@
 import * as Blockly from "blockly";
-
-import arduinoGenerator from "./arduinoGenerator";
-
-// Generator for servo rotation block
+import arduinoGenerator from "./arduinoGenerator.js";
 
 arduinoGenerator.forBlock["servo_rotate_microseconds"] = function (block) {
   const pin = block.getFieldValue("PIN");
-  const micros = block.getFieldValue("MICROS");
+  const micros =
+    arduinoGenerator.valueToCode(block, "MICROS", arduinoGenerator.ORDER_ATOMIC) || "1500";
 
-  // Add required includes and declarations
-  arduinoGenerator.addInclude("#include <Servo.h>");
+  arduinoGenerator.addInclude(`#include <Servo.h>`);
   arduinoGenerator.addDeclaration(`Servo servo_${pin};`);
-  arduinoGenerator.addSetup(`servo_${pin}.attach(${pin});`);
-  arduinoGenerator.addLoopTrap(`servo_${pin}.writeMicroseconds(${micros})`);
 
-  return `  servo_${pin}.writeMicroseconds(${micros});\n`;
+  let isSetup = false;
+  let parent = block.getParent();
+  while (parent) {
+    const input = parent.inputList.find(
+      (input) => input.connection?.targetBlock() === block
+    );
+    if (input && input.name === "SETUP_CODE") {
+      isSetup = true;
+      break;
+    }
+    block = parent;
+    parent = block.getParent();
+  }
+
+  arduinoGenerator.addSetup(`servo_${pin}.attach(${pin});`);
+
+  if (isSetup) {
+    arduinoGenerator.addSetup(`servo_${pin}.writeMicroseconds(${micros});`);
+    return '';
+  } else {
+    return `servo_${pin}.writeMicroseconds(${micros});\n`;
+  }
 };

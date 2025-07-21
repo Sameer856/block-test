@@ -5,7 +5,7 @@ import arduinoGenerator from './arduinoGenerator.js';
 arduinoGenerator.includes_ = arduinoGenerator.includes_ || new Set();
 arduinoGenerator.definitions_ = arduinoGenerator.definitions_ || {};
 
-arduinoGenerator.forBlock['servo_read'] = function (block) {
+arduinoGenerator.forBlock['servo_detach'] = function (block) {
   const pin = block.getFieldValue('PIN');
   const varName = `servo_${pin}`;
 
@@ -17,8 +17,9 @@ arduinoGenerator.forBlock['servo_read'] = function (block) {
   arduinoGenerator.addInclude("#include <Servo.h>");
   arduinoGenerator.addDeclaration(`Servo servo_${pin};`);
   arduinoGenerator.addSetup(`servo_${pin}.attach(${pin});`);
+  
 
   // No setup code
-  return `  ${varName}.read();\n`;
+  return `  ${varName}.detach();\n`;
 };
 

@@ -45,6 +45,9 @@ export default function App() {
       </block>
     </value>
   </block>
+      <block type="servo_detach"></block>
+      <block type="servo_attach"></block>
+      <block type="set_pwm_servo"></block>
     </category>
   </xml>
 `;
@@ -52,7 +55,7 @@ export default function App() {
   useEffect(() => {
     console.log("useEffect triggered");
     console.log("blocklyDiv.current:", blocklyDiv.current);
-    console.log("workspaceRef.current:", workspaceRef.current);
+    console.log("workspaceRef.current:", workspaceRef.current)
 
     if (!workspaceRef.current && blocklyDiv.current) {
       console.log("Initializing workspace...");
@@ -97,9 +100,11 @@ export default function App() {
       );
     }
   };
-
+  
+  
   return (
     <div className="App">
+      
       <Navbar
         selectedBoard={selectedBoard}
         setSelectedBoard={setSelectedBoard}
