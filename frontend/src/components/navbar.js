@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import "../styles/navbar.css";
 
 const Navbar = ({
@@ -9,14 +9,14 @@ const Navbar = ({
   onExportCode,
 }) => {
   const boards = [
-    "Arduino Uno",
-    "Arduino Mega",
-    "Arduino Nano",
-    "ESP32 Dev Module",
+    { label: "Arduino Uno", value: "arduino:avr:uno" },
+    { label: "Arduino Mega", value: "arduino:avr:mega" },
+    { label: "Arduino Nano", value: "arduino:avr:nano:cpu=atmega328old" },
+    { label: "ESP32 Dev Module", value: "esp32:esp32:esp32" },
   ];
 
   const handleChange = (e) => {
-    setSelectedBoard(e.target.value);
+    setSelectedBoard(e.target.value); // Will be fqbn like "esp32:esp32:esp32dev"
   };
 
   return (
@@ -27,8 +27,8 @@ const Navbar = ({
         <label htmlFor="board-select">Board: </label>
         <select id="board-select" value={selectedBoard} onChange={handleChange}>
           {boards.map((board) => (
-            <option key={board} value={board}>
-              {board}
+            <option key={board.value} value={board.value}>
+              {board.label}
             </option>
           ))}
         </select>

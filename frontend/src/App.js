@@ -14,7 +14,7 @@ export default function App() {
   const [codeOutput, setCodeOutput] = useState(
     "// Generated code will appear here"
   );
-  const [selectedBoard, setSelectedBoard] = useState("Arduino Uno");
+  const [selectedBoard, setSelectedBoard] = useState("arduino:avr:uno");
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadStatus, setUploadStatus] = useState("");
   const [uploadConsole, setUploadConsole] = useState("");
@@ -55,7 +55,7 @@ export default function App() {
   useEffect(() => {
     console.log("useEffect triggered");
     console.log("blocklyDiv.current:", blocklyDiv.current);
-    console.log("workspaceRef.current:", workspaceRef.current)
+    console.log("workspaceRef.current:", workspaceRef.current);
 
     if (!workspaceRef.current && blocklyDiv.current) {
       console.log("Initializing workspace...");
@@ -100,11 +100,9 @@ export default function App() {
       );
     }
   };
-  
-  
+
   return (
     <div className="App">
-      
       <Navbar
         selectedBoard={selectedBoard}
         setSelectedBoard={setSelectedBoard}

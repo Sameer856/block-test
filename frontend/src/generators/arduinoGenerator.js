@@ -54,17 +54,19 @@ arduinoGenerator.workspaceToCode = function (workspace) {
     if (block.type === "arduino_loop") {
       const code = this.blockToCode(block);
       loopCode += code + "\n";
-    }
-    if (block.type === "arduino_setup") {
-      const setupCode = this.blockToCode(block); // This gives indented lines
+    } else if (block.type === "arduino_setup") {
+      const setupCode = this.blockToCode(block); 
       setupCode.split("\n").forEach((line) => {
         const clean = line.trim();
         if (clean) this.setups_.add(clean);
       });
     } else {
-      // For blocks like setup_and_loop if used
-      const code = this.blockToCode(block);
-      loopCode += code + "\n";
+      // Optional: Prevent generation if block is inside another block
+      const parent = block.getSurroundParent?.();
+      if (!parent) {
+        const code = this.blockToCode(block);
+        loopCode += code + "\n";
+      }
     }
   }
 
@@ -82,5 +84,6 @@ ${Array.from(this.setups_)
 void loop() {
 ${loopCode}}`;
 };
+
 
 export default arduinoGenerator;

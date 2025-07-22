@@ -1,14 +1,20 @@
-import * as Blockly from "blockly";
-import "../generators/arduinoGenerator.js";
-
 export default function uploadCode(
   workspace,
   generator,
   setUploadProgress,
   setUploadStatus,
-  setUploadConsole
+  setUploadConsole,
+  selectedBoard
 ) {
   const code = generator.workspaceToCode(workspace);
+
+  const fqbn = selectedBoard; // ✅ Already the full FQBN like 'esp32:esp32:esp32'
+  console.log("Selected Board (FQBN):", fqbn);
+
+  if (!fqbn) {
+    setUploadStatus("❌ No board selected.");
+    return;
+  }
 
   if (!code.trim()) {
     setUploadStatus("❌ No code to upload. Add blocks first.");
@@ -23,12 +29,12 @@ export default function uploadCode(
   fetch("http://localhost:3001/upload", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ code }),
+    body: JSON.stringify({ code, board: fqbn }),
   })
     .then((res) => {
       setUploadProgress(60);
       if (!res.ok) {
-        throw new Error(`HTTP ${res.status}: ${res.status}`);
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
       return res.text();
     })
