@@ -15,6 +15,8 @@ import "./servo_detach_block.js"
 import "./servo_attached_blockGenerator.js"
 import "./servo_set_blockGenerator.js"
 
+import "./if_then_blockGenerator.js"
+import "./repeat_times_blockGenerator.js"
 
 import arduinoGenerator from "./arduinoGenerator";
 

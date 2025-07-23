@@ -36,6 +36,7 @@ Blockly.Blocks["servo_rotate_microseconds"] = {
 };
 // Define a custom number input block with validation
 Blockly.Blocks["servo_number_input"] = {
+
   init: function () {
     this.appendDummyInput().appendField(
       new Blockly.FieldNumber(1500, 500, 2500),

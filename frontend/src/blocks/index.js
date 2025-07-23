@@ -14,3 +14,6 @@ import "./servo_detach"
 import "./servo_attached"
 import "./servo_set_block"
 
+import "./if_then_block"
+import "./repeat_times_block"
+import "./repeat_while_block"

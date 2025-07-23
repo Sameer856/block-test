@@ -38,9 +38,9 @@ export default function App() {
       <block type="servo_read"></block>
       <block type="servo_write"></block>
       <block type="servo_rotate_microseconds" x="50" y="50">
-    <field name="PIN">2</field>
-    <value name="MICROS">
-      <block type="math_number">
+        <field name="PIN">2</field>
+        <value name="MICROS">
+          <block type="math_number">
         <field name="NUM">1500</field>
       </block>
     </value>
@@ -48,6 +48,19 @@ export default function App() {
       <block type="servo_detach"></block>
       <block type="servo_attach"></block>
       <block type="set_pwm_servo"></block>
+    </category>
+    <category name="Control" colour="#9C27B0">
+      <block type="custom_if_then"></block>
+
+      <block type="repeat_times">
+  <value name="TIMES">
+    <block type="math_number">
+      <field name="NUM">2</field>
+    </block>
+  </value>
+</block>
+
+ 
     </category>
   </xml>
 `;
