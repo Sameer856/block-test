@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./App.css";
-import * as Blockly from "blockly/core";
 import arduinoGenerator from "./generators";
 import "./blocks/index.js";
 import initWorkspace from "./workspace/workspaceInit.js";
@@ -91,14 +90,14 @@ export default function App() {
         workspaceRef.current = null;
       }
     };
-  }, []);
+  }, [toolboxXml]);
 
-  const handleGenerateCode = () => {
-    if (workspaceRef.current) {
-      const code = arduinoGenerator.workspaceToCode(workspaceRef.current);
-      setCodeOutput(code || "// No blocks in workspace.");
-    }
-  };
+  // const handleGenerateCode = () => {
+  //   if (workspaceRef.current) {
+  //     const code = arduinoGenerator.workspaceToCode(workspaceRef.current);
+  //     setCodeOutput(code || "// No blocks in workspace.");
+  //   }
+  // };
 
   const handleUploadCode = () => {
     if (workspaceRef.current) {

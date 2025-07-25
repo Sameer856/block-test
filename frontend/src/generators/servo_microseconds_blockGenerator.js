@@ -1,6 +1,10 @@
-import * as Blockly from "blockly";
 import arduinoGenerator from "./arduinoGenerator.js";
 
+function findSetupInput(parent, targetBlock) {
+  return parent.inputList.find(
+    (input) => input.connection?.targetBlock() === targetBlock
+  );
+}
 arduinoGenerator.forBlock["servo_rotate_microseconds"] = function (block) {
   const pin = block.getFieldValue("PIN");
   const micros =
@@ -12,9 +16,7 @@ arduinoGenerator.forBlock["servo_rotate_microseconds"] = function (block) {
   let isSetup = false;
   let parent = block.getParent();
   while (parent) {
-    const input = parent.inputList.find(
-      (input) => input.connection?.targetBlock() === block
-    );
+    const input = findSetupInput(parent, block);
     if (input && input.name === "SETUP_CODE") {
       isSetup = true;
       break;

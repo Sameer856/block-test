@@ -27,6 +27,7 @@ jobs:
       - name: 🛠️ Build React frontend
         run : cd frontend && npm run build
 
+
       - name: 🏗️ Build Windows app
         run: npm run dist
         env:
