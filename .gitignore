@@ -72,4 +72,4 @@ build/
 *.dmg
 *.exe
 *.zip
-*.blockmap
+*.blockmapbackup.bundle
