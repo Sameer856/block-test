@@ -20,6 +20,8 @@ import "./repeat_times_blockGenerator.js";
 import "./repeat_while_blockGenerator.js";
 import "./repeat_for_blockGenerator.js";
 import "./switch_case_blockGenerator.js";
+import "./exit_loop_blockGenerator.js"
+import "./bitwise_block_Generator.js"
 
 import arduinoGenerator from "./arduinoGenerator";
 

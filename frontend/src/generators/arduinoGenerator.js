@@ -68,19 +68,20 @@ arduinoGenerator.workspaceToCode = function (workspace) {
         const clean = line.trim();
         if (clean) this.setups_.add(clean);
       });
-    } else {
+    }  else {
       const parent = block.getSurroundParent?.();
       if (!parent) {
         const code = this.blockToCode(block);
-        
-        // ✅ Inject into loop if it's a valid loop-bound type
-        if (["switch_case", "repeat_for", "case_block", "some_other_custom"].includes(block.type)) {
+    
+        if (Array.isArray(code)) {
+          // This is a value block like bitwise_operator — make it a statement
+          loopCode += code[0] + ";\n";
+        } else if (typeof code === "string") {
           loopCode += code + "\n";
-        } else {
-          // optionally warn or inject somewhere else
         }
       }
     }
+    
     
   }
 

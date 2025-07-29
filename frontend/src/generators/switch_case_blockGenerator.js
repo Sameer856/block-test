@@ -7,10 +7,11 @@ arduinoGenerator.forBlock["switch_case"] = function (block) {
       Blockly.VARIABLE_CATEGORY_NAME
     );
   
-    const casesCode = arduinoGenerator.statementToCode(block, "CASES");
+    // For now, let’s assume a basic placeholder `case : break;` structure
+    // You can extend this later with a proper `case_block` nested block
+    const casesCode = `  case:\n      break;\n`;
   
     const code = `switch (${variable}) {\n${casesCode}}`;
-    return code;
+    return code + "\n"; // newline for clarity
   };
-  
   

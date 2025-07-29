@@ -76,6 +76,11 @@ export default function App() {
   </value>
 </block>
 <block type="switch_case" x="50" y="50"></block>
+<block type="exit_loop"></block>
+<block type="bitwise_operator"></block>
+<block type="bitwise_not"></block>
+<block type="null_value"></block>
+
 
     </category>
   </xml>
