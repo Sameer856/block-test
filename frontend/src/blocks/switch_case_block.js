@@ -1,20 +1,31 @@
-import * as Blockly from "blockly";
+const { app, BrowserWindow } = require("electron");
+const path = require("path");
 
-Blockly.Blocks["switch_case"] = {
-  init: function () {
-    this.appendDummyInput()
-      
-      .appendField("switch")
-      .appendField(new Blockly.FieldVariable("k"), "VAR")
+const isDev = !app.isPackaged;
 
-    this.appendValueInput("CONDITION").setCheck(null).appendField("is");
+function createWindow() {
+  const win = new BrowserWindow({
+    width: 1200,
+    height: 800,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+  });
 
-    this.appendStatementInput("CASES").setCheck(null).appendField("then"); // visually matches your block
+  const startURL = isDev
+    ? "http://localhost:3000"
+    : `file://${path.join(__dirname, "..", "build", "index.html")}`;
 
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setColour(45);
-    this.setTooltip("Switch statement with nested cases");
-    this.setHelpUrl("");
-  },
-};
+  win.loadURL(startURL);
+  // Optional: Uncomment this for debugging in production
+  // win.webContents.openDevTools();
+}
+
+app.whenReady().then(createWindow);
+
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
+  }
+});

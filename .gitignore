@@ -73,3 +73,7 @@ build/
 *.exe
 *.zip
 *.blockmapbackup.bundle
+
+/out/
+*.blockmap
+*.blockmapbackup.bundle

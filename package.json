@@ -25,24 +25,23 @@
       "productName": "ArduinoBlockIDE",
       "files": [
         "frontend/build/**/*",
-        "public/electron.js",
+        "public/electron.js",    
         "backend/**/*"
       ],
+
       "directories": {
         "buildResources": "assets"
       },
-      "win": {
-        "target": [
-          {
-            "target": "nsis",
-            "arch": ["x64"]
-          }
-        ],
-        "icon": "assets/icon.ico"
-      },
+   
       "mac": {
-        "target": "dmg"
-      }
+  "target": [
+    {
+      "target": "dmg",
+      "arch": ["universal"]
+    }
+  ]
+}
+
     }
   }
   

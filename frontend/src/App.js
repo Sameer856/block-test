@@ -32,9 +32,11 @@ export default function App() {
       <block type="arduino_setup"></block>
       <block type="arduino_loop"></block>
     </category>
-    <category name="Servo" colour="
-#4caf50">
+
+    <category name="Servo" colour="#4caf50">
       <block type="servo_read"></block>
+            <block type="servo_move"></block>
+
       <block type="servo_write"></block>
       <block type="servo_rotate_microseconds" x="50" y="50">
         <field name="PIN">2</field>
