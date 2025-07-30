@@ -49,14 +49,7 @@ Blockly.Blocks["repeat_while"] = {
     Blockly.Blocks["repeat_times"] = {
       init: function () {
         this.appendDummyInput()
-          .appendField(
-            new Blockly.FieldImage(
-              "https://www.gstatic.com/codesite/ph/images/reload-32.png",
-              15,
-              15,
-              "*"
-            )
-          )
+          
           .appendField("repeat");
     
         this.appendValueInput("TIMES") // VALUE INPUT for number

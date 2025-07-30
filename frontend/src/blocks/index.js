@@ -1,8 +1,8 @@
-import "./LED_block"
 import "./structure_block"
 import "./servo_block"
-import "./contol_block"
-
+import "./control_block"
+import "./LED_block"
+import "./operators_block"
 // import "./servo_move_block"
 // import "./servo_write_block"
 // import "./servo_rotate_microseconds_block"

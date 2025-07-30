@@ -1,3 +1,4 @@
+/* General Layout */
 body {
   margin: 0;
   font-family: sans-serif;
@@ -14,6 +15,7 @@ body {
   display: flex;
   flex: 1;
   height: 100vh;
+  overflow: hidden;
 }
 
 #blocklyDiv {
@@ -22,43 +24,54 @@ body {
   width: 100%;
   border-right: 2px solid #ccc;
   overflow: hidden;
+  position: relative;
 }
-/* Toolbox width */
+
+/* Toolbox (Categories panel) */
 .blocklyToolboxDiv {
-  width: 260px !important;
+  width: 400px !important;
+  background: #333;
+  overflow-y: auto !important;
 }
 
-/* Flyout width — make it big enough to show full blocks */
+/* Flyout (Block list panel) — DO NOT override scroll transforms */
 .blocklyFlyout {
-  width: 100% !important;
-  min-width: 600px !important;
+  background: #f5f5f5;
 }
 
-/* Flyout background */
-.blocklyFlyoutBackground {
-  fill: #f5f5f5;
+/* Optional: Scrollbar style for flyout (visual enhancement only) */
+.blocklyFlyout::-webkit-scrollbar {
+  width: 8px;
 }
 
-/* Flyout blocks container */
-.blocklyFlyout .blocklyBlockCanvas {
-  transform: translate(20px, 20px); /* Padding inside flyout */
+.blocklyFlyout::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
 }
 
-/* SVG width inside flyout */
-.blocklyFlyout svg {
-  width: 100% !important;
-}
-
-
-/* Target the tree structure */
-.blocklyTreeRoot {
-  width: 300px !important;
-}
-
+/* Toolbox Category Tree */
+.blocklyTreeRoot,
 .blocklyTreeTable {
-  width: 300px !important;
+  width: 100% !important;
 }
 
+.blocklyTreeRow {
+  padding: 8px 12px;
+  background-color: transparent;
+}
+
+.blocklyTreeLabel {
+  font-family: "Poppins", "Segoe UI", "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  color: #ffffff;
+}
+
+.blocklyTreeSelected > .blocklyTreeLabel {
+  color: #ffd700 !important;
+}
+
+/* Right Side Panel */
 .right-panel {
   width: 30vw;
   max-width: 40vw;
@@ -86,6 +99,7 @@ body {
   overflow: hidden;
 }
 
+/* Buttons */
 .button-group {
   margin-bottom: 10px;
   display: flex;
@@ -95,7 +109,7 @@ body {
 
 .button-group button {
   padding: 10px 20px;
-  background-color: #003060; /* Primary blue */
+  background-color: #003060;
   color: white;
   border: none;
   border-radius: 8px;
@@ -116,6 +130,7 @@ body {
   transform: scale(0.98);
 }
 
+/* Code Output */
 .code-output {
   flex: 1;
   background: #fff;
@@ -126,6 +141,7 @@ body {
   max-height: 100%;
 }
 
+/* Upload Status */
 .upload-status {
   font-weight: bold;
   margin-top: 10px;
@@ -147,6 +163,7 @@ body {
   transition: width 0.3s ease-in-out;
 }
 
+/* Upload console */
 #uploadConsole {
   background: #111;
   color: #0f0;
@@ -158,19 +175,4 @@ body {
   font-size: 13px;
   border-radius: 4px;
   border: 1px solid #333;
-}
-
-.blocklyTreeLabel {
-  font-family: "Poppins", "Segoe UI", "Inter", sans-serif;
-  font-size: 15px;
-  font-weight: 500;
-  color: #ffffff;
-}
-
-.blocklyTreeRow {
-  padding: 8px 12px;
-}
-
-.blocklyTreeSelected > .blocklyTreeLabel {
-  color: #ffd700 !important;
 }

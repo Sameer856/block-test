@@ -177,7 +177,8 @@ Blockly.Blocks["set_pwm_servo"] = {
       .appendField("to angle")
       this.appendDummyInput()
       .appendField("angle [0-180]")
-      .appendField(new Blockly.FieldNumber(90, 0, 360), "ANGLE");
+
+      .appendField(new FieldAngle(90), "ANGLE");
     this.setPreviousStatement(true, null);
     this.setNextStatement(true, null);
     this.setColour(160);
@@ -212,7 +213,7 @@ Blockly.Blocks["servo_write"] = {
 
     this.appendDummyInput()
       .appendField("angle [0-180]")
-      .appendField(new Blockly.FieldNumber(90, 0, 360), "ANGLE");
+      .appendField(new FieldAngle(90), "ANGLE");
 
     this.appendDummyInput()
       .appendField("delay")

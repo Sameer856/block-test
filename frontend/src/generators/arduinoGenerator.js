@@ -5,10 +5,16 @@ const arduinoGenerator = new Blockly.Generator("Arduino");
 // Operator precedences
 arduinoGenerator.ORDER_ATOMIC = 0;
 arduinoGenerator.ORDER_NONE = 99;
+arduinoGenerator.ORDER_MULTIPLICATIVE = 3; // * /
+arduinoGenerator.ORDER_ADDITIVE = 4;       // + -
+arduinoGenerator.ORDER_NONE = 99;
+
 
 // Storage for includes, declarations, and setup code
 arduinoGenerator.includes_ = new Set();
 arduinoGenerator.declarations_ = new Set();
+arduinoGenerator.declarationsMap_ = new Map();
+
 arduinoGenerator.setups_ = new Set();
 
 arduinoGenerator.nameDB_ = new Blockly.Names(Blockly.Generator.NAME_TYPE);
@@ -24,8 +30,13 @@ arduinoGenerator.addInclude = function (code) {
   this.includes_.add(code);
 };
 
-arduinoGenerator.addDeclaration = function (code) {
-  this.declarations_.add(code);
+arduinoGenerator.addDeclaration = function (name, code) {
+  if (!this.declarationsMap_) {
+    this.declarationsMap_ = new Map();
+  }
+  if (!this.declarationsMap_.has(name)) {
+    this.declarationsMap_.set(name, code);
+  }
 };
 
 arduinoGenerator.addSetup = function (...lines) {
@@ -49,6 +60,15 @@ arduinoGenerator.forBlock["math_number"] = function (block) {
   const code = Number(block.getFieldValue("NUM"));
   return [code, arduinoGenerator.ORDER_ATOMIC];
 };
+arduinoGenerator.functions_ = {};
+
+arduinoGenerator.addFunction = function (name, code) {
+  if (!this.functions_[name]) {
+    this.functions_[name] = code;
+  }
+};
+
+
 
 arduinoGenerator.workspaceToCode = function (workspace) {
   this.includes_.clear();
@@ -60,50 +80,51 @@ arduinoGenerator.workspaceToCode = function (workspace) {
   const blocks = workspace.getTopBlocks(true);
   for (const block of blocks) {
     if (block.type === "arduino_loop") {
-      const code = this.blockToCode(block);
-      loopCode += code + "\n";
+      loopCode += this.blockToCode(block) + "\n";
     } else if (block.type === "arduino_setup") {
       const setupCode = this.blockToCode(block); 
       setupCode.split("\n").forEach((line) => {
         const clean = line.trim();
         if (clean) this.setups_.add(clean);
       });
-    }  else {
+    } else {
       const parent = block.getSurroundParent?.();
       if (!parent) {
         const code = this.blockToCode(block);
-    
         if (Array.isArray(code)) {
-          // This is a value block like bitwise_operator — make it a statement
           loopCode += code[0] + ";\n";
         } else if (typeof code === "string") {
           loopCode += code + "\n";
         }
       }
     }
-    
-    
   }
 
+  const indentLines = (code, level = 1, indentStr = "  ") => {
+    const indent = indentStr.repeat(level);
+    return code
+      .split("\n")
+      .map((line) => (line.trim() ? indent + line.trim() : ""))
+      .join("\n");
+  };
+
   return `
-  ${Array.from(this.includes_).join("\n")}
-  
-  ${Array.from(this.declarations_).join("\n")}
-  
-  void setup() {
-  ${Array.from(this.setups_)
-    .map((line) => `  ${line}`)
-    .join("\n")}
-  }
-  
-  void loop() {
-  ${loopCode
-    .split("\n")
-    .map((line) => (line.trim() ? `  ${line}` : ""))
-    .join("\n")}
-  }`;
-  
+${Array.from(this.includes_).join("\n")}
+
+${Object.values(this.functions_).join("\n\n")}
+
+${Array.from(this.declarationsMap_.values()).join("\n")}
+
+void setup() {
+${indentLines(Array.from(this.setups_).join("\n"))}
+}
+
+void loop() {
+${indentLines(loopCode)}
+}
+`;
 };
+
 
 
 export default arduinoGenerator;

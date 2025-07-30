@@ -18,6 +18,7 @@ export default function initWorkspace(blocklyDiv, toolboxXml, arduinoGenerator, 
     scrollbars: true,
     horizontalLayout: false,
     toolboxPosition: 'start',
+    toolboxWidth: 500,
     theme: Blockly.Themes.Classic,
     renderer: 'geras',
     zoom: {
@@ -76,8 +77,20 @@ if (typeof onCodeChange === "function") {
   setTimeout(() => {
     if (!workspace.disposed) {
       Blockly.svgResize(workspace);
+  
+      const toolboxWidth = 500;
+  
+      // Wait for DOM to render toolbox/flyout
+      setTimeout(() => {
+        const toolboxDiv = document.querySelector('.blocklyToolboxDiv');
+        const flyout = document.querySelector('.blocklyFlyout');
+  
+        if (toolboxDiv) toolboxDiv.style.width = `${toolboxWidth}px`;
+        if (flyout) flyout.style.left = `${toolboxWidth}px`;
+      }, 50);
     }
   }, 100);
+  
 
   console.log("Workspace created successfully");
   return workspace;
