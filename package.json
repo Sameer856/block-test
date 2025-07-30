@@ -40,8 +40,22 @@
       "arch": ["universal"]
     }
   ]
-}
-
-    }
+},
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "sign":false,
+    "signAndEditExecutable":false
+  },
+  "nsis": {
+    "oneClick":false,
+    "perMachine":true,
+    "allowToChangeInstallationDirectory": true
   }
+}
+}
   
