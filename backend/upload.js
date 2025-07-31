@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
+const os = require("os");
 const { exec } = require("child_process");
 
 const app = express();
@@ -9,11 +10,8 @@ app.use(express.json());
 
 app.post("/upload", (req, res) => {
   const code = req.body.code;
-  let boardType = req.body.boards || req.body.board;
-  console.log('🔍 Received board:', req.body.boards);
-
-
-  // if (!boardType) boardType = "arduino:avr:uno"; // fallback
+  let boardType = req.body.boards || req.body.board || "arduino:avr:uno";
+  console.log("🔍 Received board:", boardType);
 
   console.log(`\n=== 🔧 Upload Requested ===`);
   console.log(`➡️  Board type: ${boardType}`);
@@ -28,10 +26,34 @@ app.post("/upload", (req, res) => {
     return res.status(500).send(`❌ Failed to save code: ${e.message}`);
   }
 
-  // Detect available USB serial ports (Mac-compatible)
-  const usbPorts = fs
-    .readdirSync("/dev")
-    .filter((name) => name.startsWith("cu.usb") || name.includes("usbserial") || name.includes("SLAB"));
+  // Detect available USB serial ports
+  const platform = os.platform();
+  let usbPorts = [];
+
+  try {
+    if (platform === "darwin") {
+      // macOS
+      usbPorts = fs
+        .readdirSync("/dev")
+        .filter(
+          (name) =>
+            name.startsWith("cu.usb") ||
+            name.includes("usbserial") ||
+            name.includes("SLAB")
+        )
+        .map((name) => `/dev/${name}`);
+    } else if (platform === "win32") {
+      // Windows: Try COM1 to COM20 as possible ports
+      usbPorts = Array.from({ length: 20 }, (_, i) => `COM${i + 1}`);
+    } else {
+      return res.status(500).send("❌ Unsupported OS");
+    }
+  } catch (err) {
+    return res
+      .status(500)
+      .send(`❌ Failed to read serial ports: ${err.message}`);
+  }
+
   console.log("🔌 Available USB ports:", usbPorts);
 
   if (usbPorts.length === 0) {
@@ -40,7 +62,7 @@ app.post("/upload", (req, res) => {
       .send("❌ No USB serial device found (Is your board plugged in?)");
   }
 
-  const port = `/dev/${usbPorts[0]}`;
+  const port = usbPorts[0];
   console.log(`✅ Using serial port: ${port}`);
 
   // Compile & Upload
@@ -60,7 +82,6 @@ app.post("/upload", (req, res) => {
     res.send(stdout);
   });
 });
-
 
 app.listen(3001, () => {
   console.log("✅ IDE backend running at http://localhost:3001");
