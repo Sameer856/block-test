@@ -7,8 +7,8 @@
 // import "./loopGenerator.js";
 // import "./setupGenerator.js";
 
-import "./led_block_generator.js"
-import "./structure_block_Generator.js"
+import "./led_block_generator.js";
+import "./structure_block_Generator.js";
 
 // import "./servo_move_blockGenerator.js";
 // import "./servo_write_blockGenerator.js";
@@ -18,9 +18,11 @@ import "./structure_block_Generator.js"
 // import "./servo_attached_blockGenerator.js";
 // import "./servo_set_blockGenerator.js";
 
-import "./servo_block_generator.js"
-import "./control_block_generator.js"
-import "./operators_block_generator.js"
+import "./servo_block_generator.js";
+import "./control_block_generator.js";
+import "./operators_block_generator.js";
+import "./function_generator.js"
+import "./variable_generator.js"
 // import "./if_then_blockGenerator.js";
 // import "./repeat_times_blockGenerator.js";
 // import "./repeat_while_blockGenerator.js";
@@ -30,6 +32,7 @@ import "./operators_block_generator.js"
 // import "./bitwise_block_Generator.js"
 // import "./not_and_nullGenerator.js"
 
+import "./text_generator.js";
 import arduinoGenerator from "./arduinoGenerator";
 
 export default arduinoGenerator;

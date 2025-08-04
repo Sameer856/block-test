@@ -2,19 +2,30 @@ const express = require("express");
 const cors = require("cors");
 const fs = require("fs");
 const os = require("os");
+const path = require("path");
 const { exec } = require("child_process");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
+const isDev = !process.env.ELECTRON_RUN_AS_NODE && process.env.NODE_ENV !== "production";
+
+const cliPath = isDev
+  ? path.join(__dirname, "arduino-cli", "arduino-cli")
+  : path.join(process.resourcesPath, "backend", "arduino-cli", "arduino-cli");
+
+// Ensure executable permission (macOS/Linux)
+fs.chmod(cliPath, 0o755, (err) => {
+  if (err) console.warn("⚠️ Failed to set exec permission for CLI:", err.message);
+});
+
 app.post("/upload", async (req, res) => {
   const code = req.body.code;
-  let boardType = req.body.boards || req.body.board || "arduino:avr:uno";
+  const boardType = req.body.boards || req.body.board || "arduino:avr:uno";
 
-  console.log("🔍 Received board:", boardType);
-  console.log(`\n=== 🔧 Upload Requested ===`);
-  console.log(`➡️  Board type: ${boardType}`);
+  console.log("\n=== 🔧 Upload Requested ===");
+  console.log("📦 Board:", boardType);
 
   if (!code) return res.status(400).send("❌ Missing code");
 
@@ -25,42 +36,36 @@ app.post("/upload", async (req, res) => {
     return res.status(500).send(`❌ Failed to save code: ${e.message}`);
   }
 
-  // Detect OS-specific serial ports
   const platform = os.platform();
   let port = null;
 
-  try {
-    if (platform === "darwin") {
-      // macOS
+  if (platform === "darwin") {
+    try {
       const devEntries = fs.readdirSync("/dev");
-      const match = devEntries.find(
-        (name) => name.startsWith("cu.usb") || name.includes("usbserial") || name.includes("SLAB")
+      const match = devEntries.find((name) =>
+        name.startsWith("cu.usb") || name.includes("usbserial") || name.includes("SLAB")
       );
       if (match) port = `/dev/${match}`;
-    } else if (platform === "win32") {
-      // Windows — naive guess: COM3 to COM10
-      // You can improve this using `@serialport/list`
-      for (let i = 3; i <= 10; i++) {
-        port = `COM${i}`;
-        break; // First COM assumed
-      }
-    } else {
-      return res.status(500).send("❌ Unsupported OS");
+    } catch (e) {
+      return res.status(500).send("❌ Failed to read /dev on macOS");
     }
-  } catch (e) {
-    return res.status(500).send(`❌ Port detection error: ${e.message}`);
+  } else if (platform === "win32") {
+    // Just assume COM3 for demo (can be improved with serialport module)
+    port = "COM3";
+  } else {
+    return res.status(500).send("❌ Unsupported OS");
   }
 
   if (!port) {
     return res.status(500).send("❌ No serial port found (Is your board connected?)");
   }
 
-  console.log(`✅ Using serial port: ${port}`);
+  console.log(`✅ Detected Port: ${port}`);
 
-  const compileCmd = `arduino-cli compile --fqbn ${boardType} blink`;
-  const uploadCmd = `arduino-cli upload -p ${port} --fqbn ${boardType} blink`;
+  const compileCmd = `"${cliPath}" compile --fqbn ${boardType} blink`;
+  const uploadCmd = `"${cliPath}" upload -p ${port} --fqbn ${boardType} blink`;
 
-  console.log("🚀 Running command:");
+  console.log("🚀 Command:");
   console.log(`${compileCmd} && ${uploadCmd}`);
 
   exec(`${compileCmd} && ${uploadCmd}`, (err, stdout, stderr) => {
@@ -69,7 +74,7 @@ app.post("/upload", async (req, res) => {
       return res.status(500).send(stderr || "Upload failed");
     }
 
-    console.log("✅ Upload output:\n", stdout);
+    console.log("✅ Success:\n", stdout);
     res.send(stdout);
   });
 });

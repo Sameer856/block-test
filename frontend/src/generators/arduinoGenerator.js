@@ -6,13 +6,11 @@ const arduinoGenerator = new Blockly.Generator("Arduino");
 arduinoGenerator.ORDER_ATOMIC = 0;
 arduinoGenerator.ORDER_NONE = 99;
 arduinoGenerator.ORDER_MULTIPLICATIVE = 3; // * /
-arduinoGenerator.ORDER_ADDITIVE = 4;       // + -
+arduinoGenerator.ORDER_ADDITIVE = 4; // + -
 arduinoGenerator.ORDER_NONE = 99;
-
 
 // Storage for includes, declarations, and setup code
 arduinoGenerator.includes_ = new Set();
-arduinoGenerator.declarations_ = new Set();
 arduinoGenerator.declarationsMap_ = new Map();
 
 arduinoGenerator.setups_ = new Set();
@@ -24,7 +22,6 @@ arduinoGenerator.init = function (workspace) {
   this.nameDB_.setVariableMap(workspace.getVariableMap());
 };
 
-
 // Helper methods
 arduinoGenerator.addInclude = function (code) {
   this.includes_.add(code);
@@ -34,9 +31,8 @@ arduinoGenerator.addDeclaration = function (name, code) {
   if (!this.declarationsMap_) {
     this.declarationsMap_ = new Map();
   }
-  if (!this.declarationsMap_.has(name)) {
-    this.declarationsMap_.set(name, code);
-  }
+  this.declarationsMap_.set(name, code); // Always overwrite
+
 };
 
 arduinoGenerator.addSetup = function (...lines) {
@@ -45,7 +41,6 @@ arduinoGenerator.addSetup = function (...lines) {
 arduinoGenerator.setupsMap_ = new Map(); // pin -> setup lines
 arduinoGenerator.reset = function () {
   this.includes_.clear();
-  this.declarations_.clear();
   this.setups_.clear();
   this.setupsMap_?.clear?.(); // safely clear maps too
 };
@@ -68,12 +63,10 @@ arduinoGenerator.addFunction = function (name, code) {
   }
 };
 
-
-
 arduinoGenerator.workspaceToCode = function (workspace) {
   this.includes_.clear();
-  this.declarations_.clear();
   this.setups_.clear();
+  this.functions_ = {};
 
   let loopCode = "";
 
@@ -82,7 +75,7 @@ arduinoGenerator.workspaceToCode = function (workspace) {
     if (block.type === "arduino_loop") {
       loopCode += this.blockToCode(block) + "\n";
     } else if (block.type === "arduino_setup") {
-      const setupCode = this.blockToCode(block); 
+      const setupCode = this.blockToCode(block);
       setupCode.split("\n").forEach((line) => {
         const clean = line.trim();
         if (clean) this.setups_.add(clean);
@@ -90,11 +83,18 @@ arduinoGenerator.workspaceToCode = function (workspace) {
     } else {
       const parent = block.getSurroundParent?.();
       if (!parent) {
-        const code = this.blockToCode(block);
-        if (Array.isArray(code)) {
-          loopCode += code[0] + ";\n";
-        } else if (typeof code === "string") {
-          loopCode += code + "\n";
+        // Handle top-level blocks
+        if (block.type === "declare_variable") {
+          // Process declare_variable blocks to add to declarations
+          this.blockToCode(block);
+        } else {
+          // Handle other top-level blocks
+          const code = this.blockToCode(block);
+          if (Array.isArray(code)) {
+            loopCode += code[0] + ";\n";
+          } else if (typeof code === "string") {
+            loopCode += code + "\n";
+          }
         }
       }
     }
@@ -115,6 +115,7 @@ ${Object.values(this.functions_).join("\n\n")}
 
 ${Array.from(this.declarationsMap_.values()).join("\n")}
 
+
 void setup() {
 ${indentLines(Array.from(this.setups_).join("\n"))}
 }
@@ -124,7 +125,5 @@ ${indentLines(loopCode)}
 }
 `;
 };
-
-
 
 export default arduinoGenerator;

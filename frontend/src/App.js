@@ -21,7 +21,7 @@ export default function App() {
   const toolboxXml = `
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
     <category name="LED Blocks" colour="
-#f44336">
+#D25D5D">
       <block type="blink_led"></block>
       <block type="turn_on_led"></block>
       <block type="blink_led_with_speed"></block>
@@ -85,89 +85,119 @@ export default function App() {
 </category>
 
     <category name="Operators" colour="#B9375D">
-    <block type="math_number"></block>
-      <block type="field_angle"></block>
-      <block type="pin_number"></block>
-      <block type="math_operator"></block>
-      <block type="comparison_operator"></block>
-      <block type="nested_comparison_operator"></block>
-      <block type="map_function">
-  <value name="VALUE">
-    <block type="math_number">
-      <field name="NUM">100</field>
-    </block>
-  </value>
-  <value name="FROM_LOW">
-    <block type="math_number">
-      <field name="NUM">0</field>
-    </block>
-  </value>
-  <value name="FROM_HIGH">
-    <block type="math_number">
-      <field name="NUM">1023</field>
-    </block>
-  </value>
-  <value name="TO_LOW">
-    <block type="math_number">
-      <field name="NUM">0</field>
-    </block>
-  </value>
-  <value name="TO_HIGH">
-    <block type="math_number">
-      <field name="NUM">10</field>
-    </block>
-  </value>
+            <block type="math_number"></block>
+              <block type="field_angle"></block>
+              <block type="pin_number"></block>
+              <block type="math_operator"></block>
+              <block type="comparison_operator"></block>
+              <block type="nested_comparison_operator"></block>
+              <block type="map_function">
+          <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">100</field>
+            </block>
+          </value>
+          <value name="FROM_LOW">
+            <block type="math_number">
+              <field name="NUM">0</field>
+            </block>
+          </value>
+          <value name="FROM_HIGH">
+            <block type="math_number">
+              <field name="NUM">1023</field>
+            </block>
+          </value>
+          <value name="TO_LOW">
+            <block type="math_number">
+              <field name="NUM">0</field>
+            </block>
+          </value>
+          <value name="TO_HIGH">
+            <block type="math_number">
+              <field name="NUM">10</field>
+            </block>
+          </value>
+        </block>
+              <block type="math_remainder"></block>
+              <block type="random_int_block">
+          <value name="FROM">
+            <block type="math_number">
+              <field name="NUM">10</field>
+            </block>
+          </value>
+          <value name="TO">
+            <block type="math_number">
+              <field name="NUM">99</field>
+            </block>
+          </value>
+        </block>
+
+        <block type="constrain_block">
+          <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">150</field>
+            </block>
+          </value>
+          <value name="LOW">
+            <block type="math_number">
+              <field name="NUM">0</field>
+            </block>
+          </value>
+          <value name="HIGH">
+            <block type="math_number">
+              <field name="NUM">100</field>
+            </block>
+          </value>
+        </block>
+        <block type="math_sqrt_or_abs"></block>
+        <block type="math_rounding"></block>
+        <block type="math_tri"></block>
+        <block type="math_constants"></block>
+        <block type="math_number_property"></block>
+        <block type="math_byte"></block>
+        <block type="unsigned_int"></block>
+        <block type="int_block"></block>
+        <block type="float_block"></block>
+</category>
+<category name="Text" colour="#FFBC4C">
+<block type="string_literal"></block>
+<block type="empty_string"></block>
+<block type="serial_print"></block>
+<block type="char_literal"></block>
+<block type="string_empty_constructor"></block>
+<block type="string_concat"></block>
+<block type="string_length"></block>
+<block type="string_is_empty"></block>
+<block type="string_index_of_dropdown"></block>
+<block type="string_index"></block>
+<block type="string_substring"></block>
+<block type="string_trim"></block>
+<block type="string_append_variable"></block>
+<block type="string_case_convert"></block>
+<block type="string_with_length">
+<value name="LEN">
+<block type="math_number">
+<field name="NUM">5</field>
 </block>
-      <block type="math_remainder"></block>
-      <block type="random_int_block">
-  <value name="FROM">
-    <block type="math_number">
-      <field name="NUM">10</field>
-    </block>
-  </value>
-  <value name="TO">
-    <block type="math_number">
-      <field name="NUM">99</field>
-    </block>
-  </value>
-</block>
-
-<block type="constrain_block">
-  <value name="VALUE">
-    <block type="math_number">
-      <field name="NUM">150</field>
-    </block>
-  </value>
-  <value name="LOW">
-    <block type="math_number">
-      <field name="NUM">0</field>
-    </block>
-  </value>
-  <value name="HIGH">
-    <block type="math_number">
-      <field name="NUM">100</field>
-    </block>
-  </value>
-</block>
-<block type="math_sqrt_or_abs"></block>
-<block type="math_rounding"></block>
-<block type="math_tri"></block>
-<block type="math_constants"></block>
-<block type="math_number_property"></block>
-<block type="math_byte"></block>
-<block type="unsigned_int"></block>
-<block type="int_block"></block>
-<block type="float_block"></block>
+</value>
+</category>
+<category name="Functions" colour="290">
+  <block type="arduino_do"></block>
+    <block type="arduino_function_return"></block>
+        <block type="arduino_return"></block>
 
 
+</category>
+<category name="Variables" colour="30">
+  <block type="declare_variable"></block>
+  <block type="set_variable"></block>
+  <block type="change_variable"></block>
+  <block type="declare_constant"></block>
+  <block type="set_constant"></block>
+  <block type="get_variable"></block>
+</category>
 
 
-
-
-
-
-    </category>
-  
 
   </xml>
 `;
