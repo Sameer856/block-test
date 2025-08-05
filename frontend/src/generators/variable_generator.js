@@ -34,3 +34,58 @@ arduinoGenerator.forBlock["declare_variable"] = function (block) {
   return '';
 };
 
+arduinoGenerator.forBlock["set_variable"] = function (block) {
+  const rawVarName = block.getFieldValue("VAR");
+  const varName = arduinoGenerator.nameDB_.getName(rawVarName, Blockly.VARIABLE_CATEGORY_NAME);
+  const value = arduinoGenerator.valueToCode(block, "VALUE", arduinoGenerator.ORDER_ASSIGNMENT) || "0";
+
+  return `${varName} = ${value};\n`;
+};
+arduinoGenerator.forBlock["change_variable"] = function (block) {
+  const rawVarName = block.getFieldValue("VAR");
+  const varName = arduinoGenerator.nameDB_.getName(rawVarName, Blockly.VARIABLE_CATEGORY_NAME);
+  const delta = arduinoGenerator.valueToCode(block, "DELTA", arduinoGenerator.ORDER_ADDITION) || "0";
+
+  const code = `${varName} = ${varName} + ${delta};\n`;
+  return code;
+};
+arduinoGenerator.forBlock["declare_constant"] = function (block) {
+  const rawVarName = block.getFieldValue("VAR");
+  const varName = arduinoGenerator.nameDB_.getName(rawVarName, Blockly.VARIABLE_CATEGORY_NAME);
+  const type = block.getFieldValue("TYPE");
+  const value = arduinoGenerator.valueToCode(block, "VALUE", arduinoGenerator.ORDER_ATOMIC) || "";
+
+  // Map dropdown value to Arduino types
+  const typeMap = {
+    "BOOLEAN": "bool",
+    "CHAR": "char",
+    "TEXT": "String",
+    "BYTE": "byte",
+    "INT": "int",
+    "UINT": "unsigned int",
+    "LONG": "long",
+    "FLOAT": "float"
+  };
+
+  const cppType = typeMap[type] || "0"; // Default to int if undefined
+
+  const code = `const ${cppType} ${varName} = ${value};\n`;
+  arduinoGenerator.addDeclaration(varName, code);
+  return ""; // No inline code needed in setup() or loop()
+};
+arduinoGenerator.forBlock['set_constant'] = function(block) {
+  const rawVarName = block.getFieldValue("VAR");
+  const varName = arduinoGenerator.nameDB_.getName(rawVarName, Blockly.VARIABLE_CATEGORY_NAME);
+  const value = arduinoGenerator.valueToCode(block, "VALUE", arduinoGenerator.ORDER_ATOMIC) || "";
+
+  const defineCode = `#define ${varName} ${value}`;
+  arduinoGenerator.addDeclaration(varName, defineCode + '\n');
+
+  return ""; // No code inside setup() or loop()
+};
+
+arduinoGenerator.forBlock['get_variable'] = function(block) {
+  const rawVarName = block.getFieldValue("VAR");
+  const varName = arduinoGenerator.nameDB_.getName(rawVarName, Blockly.VARIABLE_CATEGORY_NAME);
+  return [varName, arduinoGenerator.ORDER_ATOMIC];
+};
