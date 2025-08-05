@@ -9,76 +9,95 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const isDev = !process.env.ELECTRON_RUN_AS_NODE && process.env.NODE_ENV !== "production";
-
-const cliPath = isDev
-  ? path.join(__dirname, "arduino-cli", "arduino-cli")
-  : path.join(process.resourcesPath, "backend", "arduino-cli", "arduino-cli");
-
-// Ensure executable permission (macOS/Linux)
-fs.chmod(cliPath, 0o755, (err) => {
-  if (err) console.warn("⚠️ Failed to set exec permission for CLI:", err.message);
-});
-
-app.post("/upload", async (req, res) => {
+app.post("/upload", (req, res) => {
   const code = req.body.code;
-  const boardType = req.body.boards || req.body.board || "arduino:avr:uno";
+  let boardType = req.body.boards || req.body.board || "arduino:avr:uno"; // Default fallback
 
   console.log("\n=== 🔧 Upload Requested ===");
-  console.log("📦 Board:", boardType);
+  console.log("Board:", boardType);
 
   if (!code) return res.status(400).send("❌ Missing code");
 
+  // === 1. Create sketch folder and save blink.ino ===
+  const isPackaged = !!process.resourcesPath;
+  const sketchDir = isPackaged
+    ? path.join(os.tmpdir(), "arduino-ide-sketch")
+    : path.join(__dirname, "blink");
+
+  const inoPath = path.join(sketchDir, "blink.ino");
+
   try {
-    fs.mkdirSync("blink", { recursive: true });
-    fs.writeFileSync("blink/blink.ino", code);
+    fs.mkdirSync(sketchDir, { recursive: true });
+    fs.writeFileSync(inoPath, code);
   } catch (e) {
     return res.status(500).send(`❌ Failed to save code: ${e.message}`);
   }
 
-  const platform = os.platform();
-  let port = null;
+  // === 2. Detect serial port ===
+  const platform = process.platform;
+  let port;
 
-  if (platform === "darwin") {
-    try {
-      const devEntries = fs.readdirSync("/dev");
-      const match = devEntries.find((name) =>
-        name.startsWith("cu.usb") || name.includes("usbserial") || name.includes("SLAB")
+  try {
+    if (platform === "darwin") {
+      const devDir = "/dev";
+      const usbPorts = fs.readdirSync(devDir).filter(name =>
+        name.includes("usb") || name.includes("SLAB") || name.includes("modem")
       );
-      if (match) port = `/dev/${match}`;
-    } catch (e) {
-      return res.status(500).send("❌ Failed to read /dev on macOS");
+      if (usbPorts.length === 0) throw new Error("No USB devices found");
+      port = path.join(devDir, usbPorts[0]);
+    } else if (platform === "win32") {
+      // NOTE: You should use `serialport` package for dynamic detection
+      port = "COM3"; // Default fallback for Windows
+    } else {
+      // Linux
+      const devDir = "/dev";
+      const usbPorts = fs.readdirSync(devDir).filter(name =>
+        name.startsWith("ttyUSB") || name.startsWith("ttyACM")
+      );
+      if (usbPorts.length === 0) throw new Error("No USB devices found");
+      port = path.join(devDir, usbPorts[0]);
     }
-  } else if (platform === "win32") {
-    // Just assume COM3 for demo (can be improved with serialport module)
-    port = "COM3";
+  } catch (e) {
+    return res.status(500).send(`❌ USB detection error: ${e.message}`);
+  }
+
+  console.log(`✅ Using port: ${port}`);
+
+  // === 3. Locate CLI and config file ===
+  let cliPath, cliConfig;
+  if (isPackaged) {
+    cliPath = path.join(process.resourcesPath, "electron", "cli", "arduino-cli");
+    cliConfig = path.join(process.resourcesPath, "electron", "cli", "arduino-cli.yaml");
   } else {
-    return res.status(500).send("❌ Unsupported OS");
+    cliPath = path.join(__dirname, "..", "electron", "cli", "arduino-cli");
+    cliConfig = path.join(__dirname, "..", "electron", "cli", "arduino-cli.yaml");
   }
 
-  if (!port) {
-    return res.status(500).send("❌ No serial port found (Is your board connected?)");
+  console.log("🔧 Using Arduino CLI:", cliPath);
+  console.log("📄 Using CLI config:", cliConfig);
+
+  // Ensure Arduino CLI uses local data dir (not system Arduino15)
+process.env.ARDUINO_DATA_DIR = path.join(path.dirname(cliConfig), "arduino15");
+
+// Build compile and upload command
+const compileCmd = `"${cliPath}" --config-file "${cliConfig}" compile --fqbn ${boardType} "${sketchDir}"`;
+const uploadCmd = `"${cliPath}" --config-file "${cliConfig}" upload -p ${port} --fqbn ${boardType} "${sketchDir}"`;
+
+console.log("🚀 CMD:", compileCmd, "&&", uploadCmd);
+
+
+exec(`${compileCmd} && ${uploadCmd}`, { env: process.env }, (err, stdout, stderr) => {
+  if (err) {
+    console.error("❌ Upload error:", stderr || err.message);
+    return res.status(500).send(stderr || err.message);
   }
 
-  console.log(`✅ Detected Port: ${port}`);
-
-  const compileCmd = `"${cliPath}" compile --fqbn ${boardType} blink`;
-  const uploadCmd = `"${cliPath}" upload -p ${port} --fqbn ${boardType} blink`;
-
-  console.log("🚀 Command:");
-  console.log(`${compileCmd} && ${uploadCmd}`);
-
-  exec(`${compileCmd} && ${uploadCmd}`, (err, stdout, stderr) => {
-    if (err) {
-      console.error("❌ Upload failed:\n", stderr);
-      return res.status(500).send(stderr || "Upload failed");
-    }
-
-    console.log("✅ Success:\n", stdout);
-    res.send(stdout);
+  console.log("✅ Upload successful:\n", stdout);
+  res.send(stdout);
   });
 });
 
-app.listen(3001, () => {
-  console.log("✅ IDE backend running at http://localhost:3001");
+const PORT = 3001;
+app.listen(PORT, () => {
+  console.log(`✅ IDE backend running on http://localhost:${PORT}`);
 });

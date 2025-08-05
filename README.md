@@ -77,6 +77,18 @@ curl -fsSL https://raw.githubusercontent.com/arduino/arduino-cli/master/install.
 - **Frontend**: Static HTML with Blockly on port 8080
 - **Upload**: Uses Arduino CLI for compilation and upload
 
+## Building for Distribution
+
+### macOS Package Building
+For comprehensive build instructions:
+- 📖 **[Complete Guide](./BUILD_MAC.md)** - Detailed macOS build documentation
+- ⚡ **[Quick Reference](./BUILD_QUICK_REFERENCE.md)** - Common commands and fixes
+
+### Quick Build
+```bash
+npm run dist  # Builds macOS .dmg installer
+```
+
 ## Troubleshooting
 
 - **No USB device found**: Make sure your Arduino is connected and drivers are installed

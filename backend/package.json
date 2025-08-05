@@ -1,0 +1,17 @@
+{
+    "name": "arduino-ide-backend",
+    "version": "1.0.0",
+    "main": "upload.js",
+    "scripts": {
+        "start": "node upload.js"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "express": "^4.21.2"
+    },
+    "description": "",
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "type": "commonjs"
+}
