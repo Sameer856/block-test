@@ -196,7 +196,21 @@ export default function App() {
   <block type="set_constant"></block>
   <block type="get_variable"></block>
 </category>
+<category name="Arrays" colour="100">
+  <block type="array_set"></block>
+  <block type="array_set_element"></block>
+  <block type="array_put_element"></block>
 
+  <block type="array_get_element"></block>
+  <block type="array_size"></block>
+  <block type="list_create_with"></block>
+  <block type="list_set_element"></block>
+  <block type="list_get_element"></block>
+  <block type="array_add_element"></block>
+    <block type="size_of"></block>
+
+  
+</category>
 
 
   </xml>
