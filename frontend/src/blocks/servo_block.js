@@ -24,13 +24,96 @@ Blockly.Blocks["servo_read"] = {
         ]),
         "PIN"
       );
-
-    this.setOutput(true, "Number"); // ✅ Inner block outputting a value
-    this.setColour("#3f51b5");
-    this.setTooltip("Reads the current servo angle from a pin.");
-    this.setHelpUrl("");
-  },
-};
+      
+      this.setOutput(true, "Number"); // ✅ Inner block outputting a value
+      this.setColour("#3f51b5");
+      this.setTooltip("Reads the current servo angle from a pin.");
+      this.setHelpUrl("");
+    },
+  };
+  Blockly.Blocks["servo_move"] = {
+    init: function () {
+      this.appendDummyInput()
+        .appendField(
+          new Blockly.FieldImage(
+            "https://img.icons8.com/ios-filled/24/000000/servo.png",
+            20,
+            20,
+            "*"
+          )
+        )
+        .appendField("angle [0-180]")
+        .appendField("PIN")
+        .appendField(
+          new Blockly.FieldDropdown([
+            ["2", "2"],
+            ["3", "3"],
+            ["4", "4"],
+            ["5", "5"],
+          ]),
+          "PIN"
+        );
+  
+      this.setOutput(true, "Number"); // ✅ Inner block outputting a value
+      this.setColour("#3f51b5");
+      this.setTooltip("Reads the current servo angle from a pin.");
+      this.setHelpUrl("");
+    },
+  };
+  Blockly.Blocks["servo_write"] = {
+    init: function () {
+      this.appendDummyInput()
+        .appendField("Rotate PIN")
+        .appendField(
+          new Blockly.FieldDropdown([
+            ["2", "2"],
+            ["3", "3"],
+            ["4", "4"],
+            ["5", "5"],
+          ]),
+          "PIN"
+        );
+  
+      this.appendDummyInput()
+        .appendField("angle [0-180]")
+        .appendField(new FieldAngle(90), "ANGLE");
+  
+      this.appendDummyInput()
+        .appendField("delay")
+        .appendField(new Blockly.FieldNumber(80, 0), "DELAY");
+  
+      this.setColour("#3f51b5");
+      this.setPreviousStatement(true, null);
+      this.setNextStatement(true, null);
+      this.setTooltip("Attaches a servo to a pin and writes angle");
+      this.setHelpUrl("");
+    },
+  };
+  Blockly.Blocks["servo_rotate_microseconds"] = {
+    init: function () {
+      this.appendDummyInput()
+        .appendField("rotate")
+        .appendField(
+          new Blockly.FieldDropdown([
+            ["PIN 2", "2"],
+            ["PIN 3", "3"],
+            ["PIN 4", "4"],
+            ["PIN 5", "5"],
+          ]),
+          "PIN"
+        ) // This is a FIELD (use getFieldValue)
+        .appendField("microseconds");
+  
+      this.appendValueInput("MICROS") // This is a VALUE INPUT (use valueToCode)
+        .setCheck("Number");
+  
+      this.setInputsInline(true);
+      this.setPreviousStatement(true, null);
+      this.setNextStatement(true, null);
+      this.setColour(290);
+      this.setTooltip("Control servo with microsecond pulses (500-2500μs)");
+    },
+  };
 
 
 // Define the servo rotation block
@@ -96,63 +179,9 @@ Blockly.Blocks["servo_detach"] = {
 };
 
 
-Blockly.Blocks["servo_move"] = {
-    init: function () {
-      this.appendDummyInput()
-        .appendField(
-          new Blockly.FieldImage(
-            "https://img.icons8.com/ios-filled/24/000000/servo.png",
-            20,
-            20,
-            "*"
-          )
-        )
-        .appendField("get servo angle")
-        .appendField("PIN")
-        .appendField(
-          new Blockly.FieldDropdown([
-            ["2", "2"],
-            ["3", "3"],
-            ["4", "4"],
-            ["5", "5"],
-          ]),
-          "PIN"
-        );
-  
-      this.setOutput(true, "Number"); // ✅ Inner block outputting a value
-      this.setColour("#3f51b5");
-      this.setTooltip("Reads the current servo angle from a pin.");
-      this.setHelpUrl("");
-    },
-  };
   
 
   // Define the servo rotation block
-  Blockly.Blocks["servo_rotate_microseconds"] = {
-    init: function () {
-      this.appendDummyInput()
-        .appendField("rotate")
-        .appendField(
-          new Blockly.FieldDropdown([
-            ["PIN 2", "2"],
-            ["PIN 3", "3"],
-            ["PIN 4", "4"],
-            ["PIN 5", "5"],
-          ]),
-          "PIN"
-        ) // This is a FIELD (use getFieldValue)
-        .appendField("microseconds");
-  
-      this.appendValueInput("MICROS") // This is a VALUE INPUT (use valueToCode)
-        .setCheck("Number");
-  
-      this.setInputsInline(true);
-      this.setPreviousStatement(true, null);
-      this.setNextStatement(true, null);
-      this.setColour(290);
-      this.setTooltip("Control servo with microsecond pulses (500-2500μs)");
-    },
-  };
   // Define a custom number input block with validation
   Blockly.Blocks["servo_number_input"] = {
   
@@ -197,32 +226,3 @@ if (!Blockly.registry.hasItem(Blockly.registry.Type.FIELD, "field_angle")) {
   );
 }
 
-Blockly.Blocks["servo_write"] = {
-  init: function () {
-    this.appendDummyInput()
-      .appendField("Rotate PIN")
-      .appendField(
-        new Blockly.FieldDropdown([
-          ["2", "2"],
-          ["3", "3"],
-          ["4", "4"],
-          ["5", "5"],
-        ]),
-        "PIN"
-      );
-
-    this.appendDummyInput()
-      .appendField("angle [0-180]")
-      .appendField(new FieldAngle(90), "ANGLE");
-
-    this.appendDummyInput()
-      .appendField("delay")
-      .appendField(new Blockly.FieldNumber(80, 0), "DELAY");
-
-    this.setColour("#3f51b5");
-    this.setPreviousStatement(true, null);
-    this.setNextStatement(true, null);
-    this.setTooltip("Attaches a servo to a pin and writes angle");
-    this.setHelpUrl("");
-  },
-};

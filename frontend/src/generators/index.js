@@ -24,6 +24,7 @@ import "./operators_block_generator.js";
 import "./function_generator.js"
 import "./variable_generator.js"
 import "./array_generator.js"
+import "./usbSerial_generators.js"
 // import "./if_then_blockGenerator.js";
 // import "./repeat_times_blockGenerator.js";
 // import "./repeat_while_blockGenerator.js";

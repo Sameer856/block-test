@@ -33,7 +33,7 @@ export default function App() {
       <block type="arduino_loop"></block>
     </category>
 
-    <category name="Servo" colour="#4caf50">
+     <category name="Servo" colour="#4caf50">
       <block type="servo_read"></block>
             <block type="servo_move"></block>
 
@@ -208,8 +208,53 @@ export default function App() {
   <block type="list_get_element"></block>
   <block type="array_add_element"></block>
     <block type="size_of"></block>
+</category>
+<category name="Communicate" colour="#567568">
+    <category name="USB Serial" colour="#567568">
+    <block type="serial_begin">
+      <field name="BAUD">19200</field>
+    </block>
+        <block type="serial_available"></block>
+        <block type="serial_read"></block>
+        <block type="serial_readstring"></block>
+        <block type="serial_parsefloat"></block>
+        <block type="usbserial_print">
+         <value name="VALUE">
+            <block type="math_number">
+              <field name="NUM">10</field>
+            </block>
+        </block>
+        <block type="serial_print_same_line">
+  <field name="METHOD">PRINTLN</field>
+  <value name="VALUE">
+    <block type="text">
+      <field name="TEXT">Hello Blockly!</field>
+    </block>
+  </value>
+</block>
+<block type="serial_print_diff_line">
+  <field name="METHOD">PRINTLN</field>
+  <value name="VALUE">
+    <block type="text">
+      <field name="TEXT">Hello Blockly!</field>
+    </block>
+  </value>
+</block>
+<block type="serial_write">
+  <field name="METHOD">PRINTLN</field>
+  <value name="VALUE">
+    <block type="text">
+      <field name="TEXT">A</field>
+    </block>
+  </value>
+</block>
+</category>
+<category name="Software Serial" colour="#567568"></category>
+<category name="Bluetooth" colour="#567568"></category>
+<category name="Remote Control" colour="#567568"></category>
 
-  
+
+
 </category>
 
 
