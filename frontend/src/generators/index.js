@@ -21,10 +21,11 @@ import "./structure_block_Generator.js";
 import "./servo_block_generator.js";
 import "./control_block_generator.js";
 import "./operators_block_generator.js";
-import "./function_generator.js"
-import "./variable_generator.js"
-import "./array_generator.js"
-import "./usbSerial_generators.js"
+import "./function_generator.js";
+import "./variable_generator.js";
+import "./array_generator.js";
+import "./usbSerial_generators.js";
+import "./softwareSerial_generator.js";
 // import "./if_then_blockGenerator.js";
 // import "./repeat_times_blockGenerator.js";
 // import "./repeat_while_blockGenerator.js";

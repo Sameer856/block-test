@@ -249,7 +249,46 @@ export default function App() {
   </value>
 </block>
 </category>
-<category name="Software Serial" colour="#567568"></category>
+<category name="Software Serial" colour="#567568">
+  <block type="software_serial_setup"></block>
+  <block type="software_serial_available"></block>
+  <block type="software_serial_read"></block>
+  <block type="serial_read_string"></block>
+  <block type="serial_read_float"></block>
+  <block type="software_serial_print">
+  <value name="VALUE">
+    <block type="math_number">
+      <field name="NUM">0</field>
+    </block>
+  </value>
+  <field name="FORMAT">DEC</field>
+</block>
+<block type="software_serial_print_text">
+  <value name="VALUE">
+    <block type="text">
+      <field name="TEXT">Hello World</field>
+    </block>
+  </value>
+</block>
+<block type="software_serial_print_newline_text">
+  <value name="VALUE">
+    <block type="text">
+      <field name="TEXT">Hello World</field>
+    </block>
+  </value>
+</block>
+<block type="software_serial_print_write">
+  <value name="VALUE">
+    <block type="text">
+      <field name="TEXT">A</field>
+    </block>
+  </value>
+</block>
+
+
+
+
+</category>
 <category name="Bluetooth" colour="#567568"></category>
 <category name="Remote Control" colour="#567568"></category>
 
