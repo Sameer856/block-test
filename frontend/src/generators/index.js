@@ -36,6 +36,7 @@ import "./softwareSerial_generator.js";
 // import "./not_and_nullGenerator.js"
 
 import "./text_generator.js";
+import "./timing_generator.js"
 import arduinoGenerator from "./arduinoGenerator";
 
 export default arduinoGenerator;

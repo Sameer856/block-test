@@ -284,18 +284,41 @@ export default function App() {
     </block>
   </value>
 </block>
-
-
-
-
 </category>
 <category name="Bluetooth" colour="#567568"></category>
 <category name="Remote Control" colour="#567568"></category>
-
-
+</category>
+<category name="Timing" colour="#94778B">
+<block type="software_serial_delay">
+  <value name="VALUE">
+    <block type="math_number">
+      <field name="NUM">1</field>
+    </block>
+  </value>
+  <field name="UNIT">SECONDS</field>
+</block>
+<block type="millis_timer">
+  <field name="INTERVAL">1</field>
+  <field name="UNIT">SECONDS</field>
+  <statement name="DO">
+      <value name="VALUE">
+        <block type="text">
+          <field name="TEXT">Tick!</field>
+        </block>
+      </value>
+  </statement>
+</block>
+<block type="timekeeping_start"></block>
+<block type="time_since_start"></block>
+<block type="pulse_in">
+  <value name="PIN">
+    <block type="math_number">
+      <field name="NUM">10</field>
+    </block>
+  </value>
+</block>
 
 </category>
-
 
   </xml>
 `;
