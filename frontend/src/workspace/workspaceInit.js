@@ -1,97 +1,101 @@
 import * as Blockly from "blockly/core";
 
-export default function initWorkspace(blocklyDiv, toolboxXml, arduinoGenerator, onCodeChange) {
-  // Clean up any existing workspace
-  const existingWorkspace = Blockly.getMainWorkspace();
-  if (existingWorkspace && !existingWorkspace.disposed) {
-    try {
-      console.log("Disposing existing workspace...");
-      existingWorkspace.dispose();
-    } catch (error) {
-      console.warn('Error disposing existing workspace:', error);
-    }
+let workspace = null; // global reference
+
+export default function initWorkspace(
+  blocklyDiv,
+  toolboxXml,
+  arduinoGenerator,
+  onCodeChange
+) {
+  // Reuse existing workspace
+  if (workspace && !workspace.isDisposed) {
+    Blockly.svgResize(workspace);
+    return workspace;
   }
 
-  const workspace = Blockly.inject(blocklyDiv, {
-    
+  // Create new workspace
+  workspace = Blockly.inject(blocklyDiv, {
     toolbox: toolboxXml,
     scrollbars: true,
-    horizontalLayout: false,
-    toolboxPosition: 'start',
-    toolboxWidth: 500,
+    toolboxPosition: "start",
     theme: Blockly.Themes.Classic,
-    renderer: 'geras',
+    renderer: "geras",
     zoom: {
       controls: true,
       wheel: true,
-      startScale: 1.0,
+      startScale: 1,
       maxScale: 3,
       minScale: 0.3,
-      scaleSpeed: 1.2
+      scaleSpeed: 1.2,
     },
-    grid: {
-      spacing: 20,
-      length: 3,
-      colour: '#ccc',
-      snap: true
-    },
+    grid: { spacing: 20, length: 3, colour: "#ccc", snap: true },
     move: {
-      scrollbars: {
-        horizontal: true,
-        vertical: true
-      },
+      scrollbars: { horizontal: true, vertical: true },
       drag: true,
-      wheel: true
-    }
+      wheel: true,
+    },
   });
+
+  // Initialize Arduino generator
   arduinoGenerator.init(workspace);
 
-  // Add real-time code generation
-// Add real-time code generation
-if (typeof onCodeChange === "function") {
-  workspace.addChangeListener(() => {
-    if (!workspace.disposed) {
+  // Generate code helper
+  const generateCode = () => {
+    if (!workspace.isDisposed) {
       try {
-        // ✅ Clear old includes, declarations, setup lines etc.
-        if (typeof arduinoGenerator.reset === "function") {
-          arduinoGenerator.reset();
-        }
-
-        // Generate fresh code
+        arduinoGenerator.reset?.();
         const rawCode = arduinoGenerator.workspaceToCode(workspace);
         const finalCode = arduinoGenerator.finish
           ? arduinoGenerator.finish(rawCode)
           : rawCode;
-
         onCodeChange(finalCode || "// No blocks in workspace.");
-      } catch (error) {
-        console.error("Error generating code:", error);
+      } catch (err) {
+        console.error("Error generating code:", err);
         onCodeChange("// Error generating code");
       }
     }
+  };
+
+  // Restore workspace from localStorage
+  const savedXml = localStorage.getItem("blocklyWorkspace");
+  if (savedXml) {
+    try {
+      const xmlDom = Blockly.Xml.textToDom(savedXml);
+      Blockly.Xml.domToWorkspace(xmlDom, workspace);
+    } catch (err) {
+      console.error("Failed to restore workspace:", err);
+    }
+  }
+
+  // Listen to changes
+  workspace.addChangeListener(() => {
+    generateCode();
+    try {
+      const xml = Blockly.Xml.workspaceToDom(workspace);
+      localStorage.setItem("blocklyWorkspace", Blockly.Xml.domToText(xml));
+    } catch (err) {
+      console.error("Failed to save workspace:", err);
+    }
   });
+
+  generateCode(); // initial code generation
+
+  setTimeout(() => {
+    if (!workspace.isDisposed) Blockly.svgResize(workspace);
+  }, 100);
+
+  return workspace;
 }
 
-
-  // Adjust size after a brief delay
-  setTimeout(() => {
-    if (!workspace.disposed) {
-      Blockly.svgResize(workspace);
-  
-      const toolboxWidth = 500;
-  
-      // Wait for DOM to render toolbox/flyout
-      setTimeout(() => {
-        const toolboxDiv = document.querySelector('.blocklyToolboxDiv');
-        const flyout = document.querySelector('.blocklyFlyout');
-  
-        if (toolboxDiv) toolboxDiv.style.width = `${toolboxWidth}px`;
-        if (flyout) flyout.style.left = `${toolboxWidth}px`;
-      }, 50);
+// Safe dispose function
+export function disposeWorkspace() {
+  if (workspace && !workspace.isDisposed) {
+    try {
+      workspace.dispose();
+    } catch (err) {
+      console.warn("Workspace already disposed:", err);
     }
-  }, 100);
-  
-
-  console.log("Workspace created successfully");
-  return workspace;
+    workspace = null;
+  }
 }

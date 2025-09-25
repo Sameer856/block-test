@@ -5,6 +5,7 @@ import "./blocks/index.js";
 import initWorkspace from "./workspace/workspaceInit.js";
 import uploadCode from "./upload/uploadCode.js";
 import Navbar from "./components/navbar.js";
+import { disposeWorkspace } from "./workspace/workspaceInit";
 
 export default function App() {
   const blocklyDiv = useRef(null);
@@ -20,18 +21,96 @@ export default function App() {
 
   const toolboxXml = `
   <xml xmlns="https://developers.google.com/blockly/xml" id="toolbox" style="display: none">
-    <category name="LED Blocks" colour="
-#D25D5D">
+    <category name="Display" colour="#D25D5D">
+    <category name="LED Blocks" colour="#D25D5D">
       <block type="blink_led"></block>
       <block type="turn_on_led"></block>
       <block type="blink_led_with_speed"></block>
+      <block type="led_setup"></block>
+      <block type="led_onoff"></block>
+      <block type="led_pwm" x="50" y="50">
+      <field name="PIN">2</field>
+      <value name="VALUE">
+        <block type="math_number">
+      <field name="NUM">1500</field>
+    </block>
+  </value>
+</block>
     </category>
+    <category name="LED MAtrix 8 x 8" colour="#D25D5D">
+      <block type="otto_matrix_setup"></block>
+      <block type="otto_put_mouth"></block>
+      <block type="otto_clear_mouth"></block>
+      <block type="otto_matrix_intensity">
+      <value name="VALUE">
+        <block type="math_number">
+      <field name="NUM">15</field>
+    </block>
+  </value>
+ </block>
+ <block type="otto_write_text"></block>
+ <block type="otto_display_number">
+ <value name="VALUE">
+        <block type="math_number">
+      <field name="NUM">15</field>
+    </block>
+  </value>
+ </block>
+</category>
+</category>
+
     <category name="Structure" colour="
 #2196f3">
       <block type="setup_and_loop"></block>
       <block type="arduino_setup"></block>
       <block type="arduino_loop"></block>
     </category>
+    <category name="Motor" colour="
+    #2396f3">
+          <block type="motor_driver_setup"></block>
+          <block type="motor_spin">
+          <value name="SPEED">
+            <block type="math_number">
+          <field name="NUM">255</field>
+        </block>
+      </value>
+     </block>          
+     <block type="motor_stop"></block>
+      <block type="soft_pwm_motor">
+          <value name="SPEED">
+            <block type="math_number">
+          <field name="NUM">0</field>
+        </block>
+      </value>
+     </block>
+     <block type="soft_pwm_motor_stop">
+  </category>
+  
+  <category name="Stepper" colour="#4caf50"> 
+  <block type="stepper_setup">
+      <value name="VALUE">
+        <block type="math_number">
+      <field name="NUM">4096</field>
+    </block>
+  </value>
+ </block>
+ <block type="stepper_set_speed">
+    <value name="SPEED">
+      <block type="math_number">
+    <field name="NUM">20</field>
+    </block>
+    </value>
+</block>   
+<block type="stepper_set_step">
+<value name="SPEED">
+  <block type="math_number">
+<field name="NUM">20</field>
+</block>
+</value>
+</block> 
+</category>
+
+
 
      <category name="Servo" colour="#4caf50">
       <block type="servo_read"></block>
@@ -324,30 +403,18 @@ export default function App() {
 `;
 
   useEffect(() => {
-    console.log("useEffect triggered");
-    console.log("blocklyDiv.current:", blocklyDiv.current);
-    console.log("workspaceRef.current:", workspaceRef.current);
-
     if (!workspaceRef.current && blocklyDiv.current) {
-      console.log("Initializing workspace...");
-      try {
-        workspaceRef.current = initWorkspace(
-          blocklyDiv.current,
-          toolboxXml,
-          arduinoGenerator,
-          setCodeOutput
-        );
-        console.log("Workspace initialized:", workspaceRef.current);
-      } catch (error) {
-        console.error("Error initializing workspace:", error);
-      }
+      workspaceRef.current = initWorkspace(
+        blocklyDiv.current,
+        toolboxXml,
+        arduinoGenerator,
+        setCodeOutput
+      );
     }
 
     return () => {
-      if (workspaceRef.current) {
-        workspaceRef.current.dispose();
-        workspaceRef.current = null;
-      }
+      disposeWorkspace(); // safely dispose workspace
+      workspaceRef.current = null;
     };
   }, [toolboxXml]);
 

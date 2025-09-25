@@ -8,6 +8,7 @@
 // import "./setupGenerator.js";
 
 import "./led_block_generator.js";
+import "./led_matrix_8x8_generator.js";
 import "./structure_block_Generator.js";
 
 // import "./servo_move_blockGenerator.js";
@@ -36,7 +37,9 @@ import "./softwareSerial_generator.js";
 // import "./not_and_nullGenerator.js"
 
 import "./text_generator.js";
-import "./timing_generator.js"
+import "./timing_generator.js";
+import "./motor_generaotor.js";
+import "./stepper_Generator.js"
 import arduinoGenerator from "./arduinoGenerator";
 
 export default arduinoGenerator;

@@ -13,7 +13,7 @@ arduinoGenerator.ORDER_NONE = 99;
 arduinoGenerator.includes_ = new Set();
 arduinoGenerator.declarationsMap_ = new Map();
 
-arduinoGenerator.setups_ = new Set();
+arduinoGenerator.setups_ = [];
 
 arduinoGenerator.nameDB_ = new Blockly.Names(Blockly.Generator.NAME_TYPE);
 
@@ -32,17 +32,19 @@ arduinoGenerator.addDeclaration = function (name, code) {
     this.declarationsMap_ = new Map();
   }
   this.declarationsMap_.set(name, code); // Always overwrite
-
 };
 
-arduinoGenerator.addSetup = function (...lines) {
-  lines.forEach((line) => this.setups_.add(line));
+arduinoGenerator.addSetup = function (line) {
+  if (line && line.trim()) this.setups_.push(line.trim());
 };
+
 arduinoGenerator.setupsMap_ = new Map(); // pin -> setup lines
+
 arduinoGenerator.reset = function () {
   this.includes_.clear();
-  this.setups_.clear();
-  this.setupsMap_?.clear?.(); // safely clear maps too
+  this.setups_ = [];
+  this.declarationsMap_.clear();
+  this.functions_ = {};
 };
 
 arduinoGenerator.getSetupCode = function () {
@@ -65,7 +67,7 @@ arduinoGenerator.addFunction = function (name, code) {
 
 arduinoGenerator.workspaceToCode = function (workspace) {
   this.includes_.clear();
-  this.setups_.clear();
+  this.setups_ = [];
   this.functions_ = {};
 
   let loopCode = "";
@@ -117,8 +119,9 @@ ${Array.from(this.declarationsMap_.values()).join("\n")}
 
 
 void setup() {
-${indentLines(Array.from(this.setups_).join("\n"))}
-}
+  ${arduinoGenerator.setups_.map((line) => "  " + line).join("\n")}
+  }
+  
 
 void loop() {
 ${indentLines(loopCode)}
